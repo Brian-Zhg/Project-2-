@@ -62,8 +62,16 @@ async function getInspections() {
     const response = await fetch(url);
     const data = await response.json();
 
-    //iterates through api call 
+    let latestRestaurants = new Map();
+
     data.forEach(restaurant => {
+        latestRestaurants.set(restaurant.camis, restaurant);
+    });
+
+    let uniqueRestaurants = Array.from(latestRestaurants.values());
+
+    //iterates through api call 
+    uniqueRestaurants.forEach(restaurant => {
         const lat = restaurant.latitude;
         const lon = restaurant.longitude;
         //checks to see if there are coords
@@ -95,14 +103,14 @@ getInspections();
 
 //creates markers and adds to cluster
 function createMarker(lat, lon, color, dba) {
-    if (markerExists(lat, lon)) {
-        return;
-    }
     L.marker([lat, lon], { icon: icons[color] })
         .addTo(markers)
         .bindPopup(dba)
         .on("mouseover", function () {
-             this.openPopup();
+            this.openPopup();
+        })
+        .on("click", function () {
+
         });
 }
 
