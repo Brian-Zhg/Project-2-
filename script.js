@@ -3,6 +3,7 @@
 var map = L.map('map').setView([40.78, -73.97], 16);
 const markers = L.markerClusterGroup();
 
+
 //uses openstreetmap's tiles
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
@@ -47,6 +48,12 @@ const greyIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
+const icons = {
+    green: greenIcon,
+    yellow: yellowIcon,
+    red: redIcon,
+    grey: greyIcon
+};
 
 //API call 
 const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$limit=1000";
@@ -55,27 +62,25 @@ async function getInspections() {
     const response = await fetch(url);
     const data = await response.json();
 
+    //iterates through api call 
     data.forEach(restaurant => {
         const lat = restaurant.latitude;
         const lon = restaurant.longitude;
         //checks to see if there are coords
         if (lat && lon) {
+            //makes markers of different color based off rating 
             switch (restaurant.grade) {
                 case "A":
-                    L.marker([lat, lon], { icon: greenIcon }).addTo(markers)
-                        .bindPopup(restaurant.dba);
+                    createMarker(lat, lon, "green", restaurant.dba)
                     break;
                 case "B":
-                    L.marker([lat, lon], { icon: yellowIcon }).addTo(markers)
-                    .bindPopup(restaurant.dba);
+                    createMarker(lat, lon, "yellow", restaurant.dba)
                     break;
                 case "C":
-                    L.marker([lat, lon], { icon: redIcon }).addTo(markers)
-                    .bindPopup(restaurant.dba);
+                    createMarker(lat, lon, "red", restaurant.dba)
                     break;
                 default:
-                    L.marker([lat, lon], { icon: greyIcon }).addTo(markers)
-                    .bindPopup(restaurant.dba);
+                    createMarker(lat, lon, "grey", restaurant.dba)
                     break;
             }
         }
@@ -88,3 +93,23 @@ async function getInspections() {
 
 getInspections();
 
+//creates markers and adds to cluster
+function createMarker(lat, lon, color, dba) {
+    if (markerExists(lat, lon)) {
+        return;
+    }
+    L.marker([lat, lon], { icon: icons[color] })
+        .addTo(markers)
+        .bindPopup(dba)
+        .on("mouseover", function () {
+             this.openPopup();
+        });
+}
+
+//checks to see if the marker exists
+function markerExists(lat, lon) {
+    return markers.getLayers().some(marker => {
+        let coords = marker.getLatLng();
+        return coords.lat == lat && coords.lng == lon;
+    });
+}
