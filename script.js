@@ -112,6 +112,7 @@ getInspections();
 
 //creates markers and adds to cluster
 function createMarker(lat, lon, color, dba, camis) {
+    let data = [];
     let marker = L.marker([lat, lon], { icon: icons[color] });
 
     marker.camis = camis;
@@ -125,6 +126,7 @@ function createMarker(lat, lon, color, dba, camis) {
             console.log(this.camis);
 
             let name = document.getElementById("rName");
+            let violations = document.getElementById("violations")
             const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
             try {
                 const response = await fetch(url);
@@ -133,7 +135,7 @@ function createMarker(lat, lon, color, dba, camis) {
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
 
-                const data = await response.json();
+                data = await response.json();
 
                 console.log(data);
 
@@ -141,6 +143,15 @@ function createMarker(lat, lon, color, dba, camis) {
                 console.error("Failed to retrieve restaurant:", error);
             }
             name.innerHTML = capitalizeWords(dba);
+            violations.innerHTML = "";
+            data.forEach(restaurant => {
+                let paragraph = document.createElement("p");
+                if(restaurant.critical_flag == "Critical"){
+                    paragraph.classList.add("critical");
+                }
+                paragraph.textContent = restaurant.violation_description;
+                violations.append(paragraph);
+            })
         });
 }
 
