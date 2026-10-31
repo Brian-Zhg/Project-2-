@@ -19,11 +19,13 @@ body {
     top: 20px;
     right: 20px;
 
-    background-color: green;
+    background-color: whitesmoke;
+    border-color: black;
     width: 60vh;
     height: 80vh;
     border-radius: 50px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 #info h4 {
@@ -32,6 +34,13 @@ body {
     width: fit-content;
 }
 
-.critical{
+#violations {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    max-height: 80%;
+}
+
+.critical {
     color: red;
 }
