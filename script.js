@@ -55,20 +55,31 @@ const icons = {
     grey: greyIcon
 };
 
-//API call 
-const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$limit=1000";
-async function getInspections() {
-    let total = 0;
-    const response = await fetch(url);
-    const data = await response.json();
+let latestRestaurants = new Map();
 
-    let latestRestaurants = new Map();
+//API call 
+async function getInspections() {
+    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$limit=1000";
+    let data = [];
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        data = await response.json();
+
+    } catch (error) {
+        console.error("Failed to retrieve restaurant:", error);
+    }
 
     data.forEach(restaurant => {
         latestRestaurants.set(restaurant.camis, restaurant);
     });
 
     let uniqueRestaurants = Array.from(latestRestaurants.values());
+    console.log(uniqueRestaurants);
 
     //iterates through api call 
     uniqueRestaurants.forEach(restaurant => {
@@ -79,38 +90,57 @@ async function getInspections() {
             //makes markers of different color based off rating 
             switch (restaurant.grade) {
                 case "A":
-                    createMarker(lat, lon, "green", restaurant.dba)
+                    createMarker(lat, lon, "green", restaurant.dba, restaurant.camis)
                     break;
                 case "B":
-                    createMarker(lat, lon, "yellow", restaurant.dba)
+                    createMarker(lat, lon, "yellow", restaurant.dba, restaurant.camis)
                     break;
                 case "C":
-                    createMarker(lat, lon, "red", restaurant.dba)
+                    createMarker(lat, lon, "red", restaurant.dba, restaurant.camis)
                     break;
                 default:
-                    createMarker(lat, lon, "grey", restaurant.dba)
+                    createMarker(lat, lon, "grey", restaurant.dba, restaurant.camis)
                     break;
             }
         }
 
     });
     map.addLayer(markers);
-    console.log(data);
-    console.log("Total:" + total);
 }
 
 getInspections();
 
 //creates markers and adds to cluster
-function createMarker(lat, lon, color, dba) {
-    L.marker([lat, lon], { icon: icons[color] })
-        .addTo(markers)
-        .bindPopup(dba)
+function createMarker(lat, lon, color, dba, camis) {
+    let marker = L.marker([lat, lon], { icon: icons[color] });
+
+    marker.camis = camis;
+
+    marker.addTo(markers)
+        .bindPopup(capitalizeWords(dba))
         .on("mouseover", function () {
             this.openPopup();
         })
-        .on("click", function () {
+        .on("click", async function () {
+            console.log(this.camis);
 
+            let name = document.getElementById("rName");
+            const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                console.log(data);
+
+            } catch (error) {
+                console.error("Failed to retrieve restaurant:", error);
+            }
+            name.innerHTML = capitalizeWords(dba);
         });
 }
 
@@ -120,4 +150,13 @@ function markerExists(lat, lon) {
         let coords = marker.getLatLng();
         return coords.lat == lat && coords.lng == lon;
     });
+}
+
+//capitalizes firstr letter of every word 
+function capitalizeWords(str) {
+    return str
+        .toLowerCase()
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
 }
