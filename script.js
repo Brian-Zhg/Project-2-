@@ -128,9 +128,11 @@ function createMarker(lat, lon, color, dba, camis) {
         })
         .on("click", async function () {
             document.getElementById("info").style.visibility = "visible";
+            let toggle =document.getElementById("amount")
             let name = document.getElementById("rName");
             let allViolations = [];
-            let violations = document.getElementById("violations")
+
+            toggle.checked = false;
             //api call for all from 1 resturaunt 
             const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
             try {
@@ -144,8 +146,9 @@ function createMarker(lat, lon, color, dba, camis) {
             } catch (error) {
                 console.error("Failed to retrieve restaurant:", error);
             }
+
             name.innerHTML = capitalizeWords(dba);
-            violations.innerHTML = "";
+
             //iterates through the violations and makes them red if critical
             data.forEach(restaurant => {
                 //sets oldest and recent to first instance of inspection date
@@ -165,7 +168,18 @@ function createMarker(lat, lon, color, dba, camis) {
                     critical: restaurant.critical_flag
                 })
             })
-            display(allViolations, false, recentInspection);
+            //displays recent first
+            display(allViolations, true, recentInspection);
+            //changes the display based off of switch at the bottom
+            toggle.addEventListener("change", function(){
+                if(toggle.checked){
+                    display(allViolations, false, recentInspection);
+                }
+                else{
+                    display(allViolations, true, recentInspection);
+                }
+            });
+            
 
             //displays oldest and newest inspection
             let startTime = document.getElementById("startTime");
@@ -216,6 +230,7 @@ function display(allViolations, recent, mostRecent) {
     let total = 0;
     let totalCritical = 0;
     let violations = document.getElementById("violations");
+    violations.innerHTML = "";
     allViolations.forEach(restaurant => {
         let paragraph = document.createElement("p");
         paragraph.textContent = restaurant.text;

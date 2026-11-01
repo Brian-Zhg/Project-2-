@@ -142,3 +142,20 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+#switchBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+#switchBox p {
+    margin: 0;
+    padding: 0;
+}
+
+#switchBox .switch {
+    margin: 0 5px;
+    flex-shrink: 0;
+}
