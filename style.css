@@ -44,3 +44,36 @@ body {
 .critical {
     color: red;
 }
+
+.statHolder {
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#totalCriticalViolations {
+    color: red;
+}
+
+.timeHolder {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+    text-align: center;
+}
+
+.timeHolder p {
+    margin: 0px 0;
+}
+
+.timeHolder a {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#totalLength{
+    text-align: center;
+}

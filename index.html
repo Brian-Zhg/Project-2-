@@ -20,7 +20,24 @@
         <div id="map"></div>
         <div id="info">
             <h4 id="rName"></h4>
-        <div id="violations"></div>
+            <div id="history">
+                <div class="statHolder">
+                    <div class="timeHolder">
+                        <a>First Inspection</a>
+                        <p id="startTime"></p>
+                    </div>
+                    <div class="timeHolder">
+                        <a>Latest Inspection</a>
+                        <p id="endTime"></p>
+                    </div>
+                </div>
+                <p id="totalLength"></p>
+            </div>
+            <div id="violations"></div>
+            <div class="statHolder">
+                <p id="totalViolations"></p>
+                <p id="totalCriticalViolations"></p>
+            </div>
         </div>
     </div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">

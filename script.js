@@ -81,7 +81,7 @@ async function getInspections() {
     let uniqueRestaurants = Array.from(latestRestaurants.values());
     console.log(uniqueRestaurants);
 
-    //iterates through api call 
+    //iterates through map and makes markers for the resturaunts that have coordinates 
     uniqueRestaurants.forEach(restaurant => {
         const lat = restaurant.latitude;
         const lon = restaurant.longitude;
@@ -114,19 +114,23 @@ getInspections();
 function createMarker(lat, lon, color, dba, camis) {
     let data = [];
     let marker = L.marker([lat, lon], { icon: icons[color] });
+    let oldestInspection = null;
+    let recentInspection = null;
 
     marker.camis = camis;
-
+    // blindPopup is what displays when hovering 
+    // on click sets the info box up with required info
     marker.addTo(markers)
         .bindPopup(capitalizeWords(dba))
         .on("mouseover", function () {
             this.openPopup();
         })
         .on("click", async function () {
-            console.log(this.camis);
-
+            let total = 0;
+            let numCritical = 0;
             let name = document.getElementById("rName");
             let violations = document.getElementById("violations")
+            //api call for all from 1 resturaunt 
             const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
             try {
                 const response = await fetch(url);
@@ -144,14 +148,54 @@ function createMarker(lat, lon, color, dba, camis) {
             }
             name.innerHTML = capitalizeWords(dba);
             violations.innerHTML = "";
+            //iterates through the violations and makes them red if critical
             data.forEach(restaurant => {
                 let paragraph = document.createElement("p");
-                if(restaurant.critical_flag == "Critical"){
+                if (restaurant.critical_flag == "Critical") {
                     paragraph.classList.add("critical");
+                    numCritical++;
                 }
+                //sets oldest and recent to first instance of inspection date
+                if (oldestInspection == null) {
+                    oldestInspection = restaurant.inspection_date;
+                    recentInspection = restaurant.inspection_date;
+                }
+                else {
+                    //compares it to new dates coming in 
+                    oldestInspection = Math.min(new Date(oldestInspection).getTime(), new Date(restaurant.inspection_date).getTime());
+                    recentInspection = Math.max(new Date(recentInspection).getTime(), new Date(restaurant.inspection_date).getTime());
+                }
+                total++;
                 paragraph.textContent = restaurant.violation_description;
                 violations.append(paragraph);
             })
+
+            //displays oldest and newest inspection
+            let startTime = document.getElementById("startTime");
+            let endTime = document.getElementById("endTime");
+            document.querySelectorAll(".timeHolder").forEach(element => {
+                element.style.display = "block";
+            });
+            let currTime = new Date();
+            //sets the dates to mm/dd/yy format 
+            startTime.innerHTML = new Date(oldestInspection).toLocaleDateString("en-US");
+            endTime.innerHTML = new Date(recentInspection).toLocaleDateString("en-US");
+            let totalLength = document.getElementById("totalLength");
+
+            //calculates the number of years and months from first inspection and todays date
+            let years = (currTime.getTime() - new Date(oldestInspection).getTime())/31536000000;
+            let months = Math.round(((currTime.getTime() - new Date (oldestInspection).getTime())%31536000000) / 2629800000);
+            //adjust the text based off of if it should be plural or not
+            let yearText = years > 1 ? (years === 1 ? years+" year " : years+" years ") : "";
+            let monthText = months > 0 ? (months === 1 ? months+ " month" : months+ " months") : "";
+            totalLength.innerHTML = "Total History: " + yearText + monthText;
+
+
+            //displays the bottom display of violations
+            let totalDisplay = document.getElementById("totalViolations");
+            let totalCritical = document.getElementById("totalCriticalViolations");
+            totalDisplay.innerHTML = "Total Violations: " + total + "&nbsp; |&nbsp;";
+            totalCritical.innerHTML = "Critical Violations: " + numCritical;
         });
 }
 
