@@ -126,6 +126,7 @@ function createMarker(lat, lon, color, dba, camis) {
             this.openPopup();
         })
         .on("click", async function () {
+            document.getElementById("info").style.backgroundColor = "white";
             let total = 0;
             let numCritical = 0;
             let name = document.getElementById("rName");
