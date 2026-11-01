@@ -127,7 +127,7 @@ function createMarker(lat, lon, color, dba, camis) {
             this.openPopup();
         })
         .on("click", async function () {
-            document.getElementById("info").style.backgroundColor = "white";
+            document.getElementById("info").style.visibility = "visible";
             let name = document.getElementById("rName");
             let allViolations = [];
             let violations = document.getElementById("violations")
@@ -139,11 +139,8 @@ function createMarker(lat, lon, color, dba, camis) {
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
-
                 data = await response.json();
-
                 console.log(data);
-
             } catch (error) {
                 console.error("Failed to retrieve restaurant:", error);
             }
