@@ -117,6 +117,7 @@ function createMarker(lat, lon, color, dba, camis) {
     let oldestInspection = null;
     let recentInspection = null;
 
+
     marker.camis = camis;
     // blindPopup is what displays when hovering 
     // on click sets the info box up with required info
@@ -127,9 +128,8 @@ function createMarker(lat, lon, color, dba, camis) {
         })
         .on("click", async function () {
             document.getElementById("info").style.backgroundColor = "white";
-            let total = 0;
-            let numCritical = 0;
             let name = document.getElementById("rName");
+            let allViolations = [];
             let violations = document.getElementById("violations")
             //api call for all from 1 resturaunt 
             const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
@@ -151,11 +151,6 @@ function createMarker(lat, lon, color, dba, camis) {
             violations.innerHTML = "";
             //iterates through the violations and makes them red if critical
             data.forEach(restaurant => {
-                let paragraph = document.createElement("p");
-                if (restaurant.critical_flag == "Critical") {
-                    paragraph.classList.add("critical");
-                    numCritical++;
-                }
                 //sets oldest and recent to first instance of inspection date
                 if (oldestInspection == null) {
                     oldestInspection = restaurant.inspection_date;
@@ -166,10 +161,14 @@ function createMarker(lat, lon, color, dba, camis) {
                     oldestInspection = Math.min(new Date(oldestInspection).getTime(), new Date(restaurant.inspection_date).getTime());
                     recentInspection = Math.max(new Date(recentInspection).getTime(), new Date(restaurant.inspection_date).getTime());
                 }
-                total++;
-                paragraph.textContent = restaurant.violation_description;
-                violations.append(paragraph);
+
+                allViolations.push({
+                    text: restaurant.violation_description,
+                    date: restaurant.inspection_date,
+                    critical: restaurant.critical_flag
+                })
             })
+            display(allViolations, false, recentInspection);
 
             //displays oldest and newest inspection
             let startTime = document.getElementById("startTime");
@@ -178,25 +177,19 @@ function createMarker(lat, lon, color, dba, camis) {
                 element.style.display = "block";
             });
             let currTime = new Date();
+
             //sets the dates to mm/dd/yy format 
             startTime.innerHTML = new Date(oldestInspection).toLocaleDateString("en-US");
             endTime.innerHTML = new Date(recentInspection).toLocaleDateString("en-US");
             let totalLength = document.getElementById("totalLength");
 
             //calculates the number of years and months from first inspection and todays date
-            let years = Math.round((currTime.getTime() - new Date(oldestInspection).getTime())/31536000000);
-            let months = Math.round(((currTime.getTime() - new Date (oldestInspection).getTime())%31536000000) / 2629800000);
+            let years = Math.round((currTime.getTime() - new Date(oldestInspection).getTime()) / 31536000000);
+            let months = Math.round(((currTime.getTime() - new Date(oldestInspection).getTime()) % 31536000000) / 2629800000);
             //adjust the text based off of if it should be plural or not
-            let yearText = years > 1 ? (years === 1 ? years+" year " : years+" years ") : "";
-            let monthText = months > 0 ? (months === 1 ? months+ " month" : months+ " months") : "";
+            let yearText = years > 1 ? (years === 1 ? years + " year " : years + " years ") : "";
+            let monthText = months > 0 ? (months === 1 ? months + " month" : months + " months") : "";
             totalLength.innerHTML = "Total History: " + yearText + monthText;
-
-
-            //displays the bottom display of violations
-            let totalDisplay = document.getElementById("totalViolations");
-            let totalCritical = document.getElementById("totalCriticalViolations");
-            totalDisplay.innerHTML = "Total Violations: " + total + "&nbsp; |&nbsp;";
-            totalCritical.innerHTML = "Critical Violations: " + numCritical;
         });
 }
 
@@ -215,4 +208,43 @@ function capitalizeWords(str) {
         .split(" ")
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(" ");
+}
+
+/*displays all violations
+    allViolations - array of objects 
+    recent - bool to check if we just want most recent
+    mostRecent -date object of latest check
+*/
+function display(allViolations, recent, mostRecent) {
+    let total = 0;
+    let totalCritical = 0;
+    let violations = document.getElementById("violations");
+    allViolations.forEach(restaurant => {
+        let paragraph = document.createElement("p");
+        paragraph.textContent = restaurant.text;
+        if (restaurant.critical == "Critical") {
+            paragraph.classList.add("critical");
+        }
+        //if we want only recent, only add if recent
+        if (recent && new Date(restaurant.date).getTime() == mostRecent) {
+            violations.append(paragraph);
+            total++;
+            if(restaurant.critical == "Critical"){
+                totalCritical++;
+            }
+        }
+        //if we don't want only recent, add everything
+        else if (!recent) {
+            violations.append(paragraph);
+            total++;
+            if(restaurant.critical == "Critical"){
+                totalCritical++;
+            }
+        }
+        //displays the bottom display of violations
+        let totalDisplay = document.getElementById("totalViolations");
+        let totalCriticalText = document.getElementById("totalCriticalViolations");
+        totalDisplay.innerHTML = "Total Violations: " + total + "&nbsp; |&nbsp;";
+        totalCriticalText.innerHTML = "Critical Violations: " + totalCritical;
+    })
 }
