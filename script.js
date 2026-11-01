@@ -195,8 +195,8 @@ function createMarker(lat, lon, color, dba, camis) {
             let totalLength = document.getElementById("totalLength");
 
             //calculates the number of years and months from first inspection and todays date
-            let years = Math.round((currTime.getTime() - new Date(oldestInspection).getTime()) / 31536000000);
-            let months = Math.round(((currTime.getTime() - new Date(oldestInspection).getTime()) % 31536000000) / 2629800000);
+            let years = Math.floor((currTime.getTime() - new Date(oldestInspection).getTime()) / 31536000000);
+            let months = Math.floor(((currTime.getTime() - new Date(oldestInspection).getTime()) % 31536000000) / 2629800000);
             //adjust the text based off of if it should be plural or not
             let yearText = years > 1 ? (years === 1 ? years + " year " : years + " years ") : "";
             let monthText = months > 0 ? (months === 1 ? months + " month" : months + " months") : "";
