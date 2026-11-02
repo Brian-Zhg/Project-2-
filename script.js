@@ -117,7 +117,6 @@ function createMarker(lat, lon, color, dba, camis) {
     let oldestInspection = null;
     let recentInspection = null;
 
-
     marker.camis = camis;
     // blindPopup is what displays when hovering 
     // on click sets the info box up with required info
@@ -127,8 +126,9 @@ function createMarker(lat, lon, color, dba, camis) {
             this.openPopup();
         })
         .on("click", async function () {
+            console.log(this.camis);
             document.getElementById("info").style.visibility = "visible";
-            let toggle =document.getElementById("amount")
+            let toggle = document.getElementById("amount")
             let name = document.getElementById("rName");
             let allViolations = [];
 
@@ -171,15 +171,15 @@ function createMarker(lat, lon, color, dba, camis) {
             //displays recent first
             display(allViolations, true, recentInspection);
             //changes the display based off of switch at the bottom
-            toggle.addEventListener("change", function(){
-                if(toggle.checked){
+            toggle.addEventListener("change", function () {
+                if (toggle.checked) {
                     display(allViolations, false, recentInspection);
                 }
-                else{
+                else {
                     display(allViolations, true, recentInspection);
                 }
             });
-            
+
 
             //displays oldest and newest inspection
             let startTime = document.getElementById("startTime");
@@ -240,16 +240,18 @@ function display(allViolations, recent, mostRecent) {
         //if we want only recent, only add if recent
         if (recent && new Date(restaurant.date).getTime() == mostRecent) {
             violations.append(paragraph);
-            total++;
-            if(restaurant.critical == "Critical"){
+            //only add if there is a violation 
+            if (restaurant.text != undefined) {total++;}
+            if (restaurant.critical == "Critical") {
                 totalCritical++;
             }
         }
         //if we don't want only recent, add everything
         else if (!recent) {
             violations.append(paragraph);
-            total++;
-            if(restaurant.critical == "Critical"){
+            //only add if there is a violation 
+            if (restaurant.text != undefined ) {total++;}
+            if (restaurant.critical == "Critical") {
                 totalCritical++;
             }
         }
