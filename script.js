@@ -59,7 +59,7 @@ let latestRestaurants = new Map();
 
 //API call 
 async function getInspections() {
-    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$limit=1000";
+    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$order=camis ASC,grade_date ASC&$limit=1000";
     let data = [];
     try {
         const response = await fetch(url);
@@ -134,7 +134,7 @@ function createMarker(lat, lon, color, dba, camis) {
 
             toggle.checked = false;
             //api call for all from 1 resturaunt 
-            const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis;
+            const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?camis=" + this.camis + "&$order=inspection_date DESC";
             try {
                 const response = await fetch(url);
 
