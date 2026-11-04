@@ -18,7 +18,37 @@
 <body>
     <div id="container">
         <div id="map"></div>
+        <div id="searchBox">
+            <div class="search-field">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7"></circle>
+                    <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+                </svg>
+                <input id="search" type="search" placeholder="Search restaurants…" autocomplete="off"
+                    aria-label="Search restaurants by name">
+                <button id="clearSearch" type="button" aria-label="Clear search" hidden>×</button>
+            </div>
+            <p id="searchStatus" hidden></p>
+        </div>
+        <div id="legend"> 
+            <strong>Grade</strong>
+            <span class="legend-hint">Click to show / hide</span>
+            <button class="legend-item" data-color="green" aria-pressed="true">
+                <span class="dot a"></span>A<span class="count" id="count-green"></span>
+            </button>
+            <button class="legend-item" data-color="yellow" aria-pressed="true">
+                <span class="dot b"></span>B<span class="count" id="count-yellow"></span>
+            </button>
+            <button class="legend-item" data-color="red" aria-pressed="true">
+                <span class="dot c"></span>C<span class="count" id="count-red"></span>
+            </button>
+            <button class="legend-item" data-color="grey" aria-pressed="true">
+                <span class="dot p"></span>Pending / other<span class="count" id="count-grey"></span>
+            </button>
+        </div>
         <div id="info">
+            <button id="closeInfo" aria-label="Close">×</button>
             <h4 id="rName"></h4>
             <div id="history">
                 <div class="statHolder">
