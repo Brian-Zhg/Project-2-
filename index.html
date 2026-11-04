@@ -19,6 +19,7 @@
     <div id="container">
         <div id="map"></div>
         <div id="info">
+            <p id="closeInfo">x</p>
             <h4 id="rName"></h4>
             <div id="history">
                 <div class="statHolder">
@@ -48,10 +49,19 @@
             </div>
         </div>
     </div>
+    <div id="chartContainer">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div id="legend">
+        <p><span class="dot a"></span>A</p>
+        <p><span class="dot b"></span>B</p>
+        <p><span class="dot c"></span>C</p>
+        <p><span class="dot p"></span>Pending</p>
+    </div>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script src="script.js"></script>

@@ -56,10 +56,12 @@ const icons = {
 };
 
 let latestRestaurants = new Map();
+let cuisines = new Set();
 
 //API call 
 async function getInspections() {
-    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$order=camis ASC,grade_date ASC&$limit=1000";
+    const url ="https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date&$where=grade%20IS%20NOT%20NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date&$order=camis%20ASC,grade_date%20ASC&$limit=1000"
+    //const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$order=camis ASC,grade_date ASC&$limit=1000";
     let data = [];
     try {
         const response = await fetch(url);
@@ -76,10 +78,13 @@ async function getInspections() {
 
     data.forEach(restaurant => {
         latestRestaurants.set(restaurant.camis, restaurant);
+        if(restaurant.cuisine_description != undefined){
+            cuisines.add(restaurant.cuisine_description);
+        }
     });
+    console.log(cuisines);
 
     let uniqueRestaurants = Array.from(latestRestaurants.values());
-    console.log(uniqueRestaurants);
 
     //iterates through map and makes markers for the resturaunts that have coordinates 
     uniqueRestaurants.forEach(restaurant => {
@@ -204,6 +209,10 @@ function createMarker(lat, lon, color, dba, camis) {
         });
 }
 
+document.getElementById("closeInfo").addEventListener("click", function(){
+    document.getElementById("info").style.visibility = "hidden";
+});
+
 //checks to see if the marker exists
 function markerExists(lat, lon) {
     return markers.getLayers().some(marker => {
@@ -262,3 +271,25 @@ function display(allViolations, recent, mostRecent) {
         totalCriticalText.innerHTML = "Critical Violations: " + totalCritical;
     })
 }
+
+//Chart logic
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
