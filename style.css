@@ -88,7 +88,7 @@ body {
 #closeInfo:hover {
   background: var(--border);
   color: red;
-  
+
 }
 
 /* first / latest inspection */
@@ -105,7 +105,8 @@ body {
 }
 
 .timeHolder {
-  display: none; /* script.js switches this on after a click */
+  display: none;
+  /* script.js switches this on after a click */
   flex: 1;
   text-align: center;
 }
@@ -181,14 +182,14 @@ body {
 }
 
 /* totals row */
-#info > .statHolder {
+#info>.statHolder {
   gap: 0;
   padding: 10px 16px;
   border-top: 1px solid var(--border);
   font-size: 0.9rem;
 }
 
-#info > .statHolder p {
+#info>.statHolder p {
   margin: 0;
 }
 
@@ -246,16 +247,16 @@ body {
   transition: transform 0.25s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: var(--accent);
 }
 
-input:focus-visible + .slider {
+input:focus-visible+.slider {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(20px);
 }
 
@@ -298,10 +299,21 @@ input:checked + .slider:before {
   vertical-align: middle;
 }
 
-.dot.a { background: var(--grade-a); }
-.dot.b { background: var(--grade-b); }
-.dot.c { background: var(--grade-c); }
-.dot.p { background: var(--grade-p); }
+.dot.a {
+  background: var(--grade-a);
+}
+
+.dot.b {
+  background: var(--grade-b);
+}
+
+.dot.c {
+  background: var(--grade-c);
+}
+
+.dot.p {
+  background: var(--grade-p);
+}
 
 /* ---------- Clusters ----------
  Default clusters are green/yellow/orange by size, which reads like
@@ -321,34 +333,88 @@ input:checked + .slider:before {
 }
 
 /* ----------Chart css ---------- */
-#myChart {
-    display: block;
-    width: 600px;
-    height: 300px;
-}
 
 #myChart {
-    position: relative;
-    z-index: 1;
+  position: absolute;
+  z-index: 100;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#chartContainer {
+  position: absolute;
+  z-index: 1000;
+  width: 50vw;
+  height: 50vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  overflow: visible;
 }
 
 /* ---------- Phones: panel becomes a bottom sheet ---------- */
 @media (max-width: 640px) {
   #info {
-      top: auto;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: auto;
-      height: 70vh;
-      border-radius: var(--radius) var(--radius) 0 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 70vh;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 
   #legend {
-      left: 8px;
-      bottom: 16px;
+    left: 8px;
+    bottom: 16px;
   }
 }
+
 .leaflet-tile-pane {
   filter: saturate(0.6) brightness(1.06);
+}
+
+/* Checkboxes */
+.multipleSelection {
+  width: 300px;
+  background-color: #BCC2C1;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkBoxes {
+  display: none;
+  border: 1px #8DF5E4 solid;
+  overflow: scroll;
+  max-height:300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#checkBoxes label {
+  display: block;
+}
+
+#checkBoxes label:hover {
+  background-color: #4F615E;
+  color: white;
+  /* Added text color for better visibility */
 }

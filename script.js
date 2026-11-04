@@ -80,18 +80,18 @@ async function getInspections() {
     data.forEach(restaurant => {
         latestRestaurants.set(restaurant.camis, restaurant);
         if (restaurant.cuisine_description != undefined) {
-        if(!cuisines.has(restaurant.cuisine_description)){
-            cuisines.set(restaurant.cuisine_description,{
-                nonCritical: 0,
-                critical: 0
-            });
-        }
-        else if(restaurant.critical_flag == "Critical"){
-            cuisines.get(restaurant.cuisine_description).critical++;
-        }
-        else{
-            cuisines.get(restaurant.cuisine_description).nonCritical++;
-        }
+            if (!cuisines.has(restaurant.cuisine_description)) {
+                cuisines.set(restaurant.cuisine_description, {
+                    nonCritical: 0,
+                    critical: 0
+                });
+            }
+            else if (restaurant.critical_flag == "Critical") {
+                cuisines.get(restaurant.cuisine_description).critical++;
+            }
+            else {
+                cuisines.get(restaurant.cuisine_description).nonCritical++;
+            }
         }
     });
     console.log(cuisines);
@@ -321,4 +321,34 @@ function createChart() {
             }
         }
     });
+}
+
+let show = true;
+
+function showCheckboxes() {
+    let checkboxes = document.getElementById("checkBoxes");
+    const sortedCuisines = new Map(
+        [...cuisines].sort((a, b) => a[0].localeCompare(b[0]))
+    );
+    document.getElementById("checkBoxes").innerHTML = "";
+    sortedCuisines.forEach((value, key) => {
+        const label = document.createElement("label");
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = key;
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(key));
+
+        checkboxes.appendChild(label);
+    });
+
+    if (show) {
+        checkboxes.style.display = "block";
+        show = false;
+    } else {
+        checkboxes.style.display = "none";
+        show = true;
+    }
 }

@@ -50,7 +50,20 @@
         </div>
     </div>
     <div id="chartContainer">
-        <canvas id="myChart"></canvas>
+        <!-- <canvas id="myChart"></canvas> -->
+        <form>
+            <div class="multipleSelection">
+                <div class="selectBox" onclick="showCheckboxes()">
+                    <select>
+                        <option>Select options</option>
+                    </select>
+                    <div class="overSelect"></div>
+                </div>
+
+                <div id="checkBoxes">
+                </div>
+            </div>
+        </form>
     </div>
     <div id="legend">
         <p><span class="dot a"></span>A</p>
