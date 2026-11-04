@@ -1,6 +1,7 @@
 
 //creates the map
 var map = L.map('map').setView([40.78, -73.97], 16);
+map.zoomControl.setPosition("bottomright");
 const markers = L.markerClusterGroup();
 
 
@@ -57,6 +58,10 @@ const icons = {
 
 let latestRestaurants = new Map();
 
+// every marker with its color, so we can filter them
+const allMarkers = [];
+const visibleColors = new Set(["green", "yellow", "red", "grey"]);
+
 //API call 
 async function getInspections() {
     const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$limit=1000";
@@ -106,6 +111,7 @@ async function getInspections() {
 
     });
     map.addLayer(markers);
+    updateLegendCounts();
 }
 
 getInspections();
@@ -114,6 +120,7 @@ getInspections();
 function createMarker(lat, lon, color, dba, camis) {
     let data = [];
     let marker = L.marker([lat, lon], { icon: icons[color] });
+    allMarkers.push({ marker, color, name: dba.toLowerCase() });
     let oldestInspection = null;
     let recentInspection = null;
 
@@ -259,4 +266,98 @@ function display(allViolations, recent, mostRecent) {
         totalDisplay.innerHTML = "Total Violations: " + total + "&nbsp; |&nbsp;";
         totalCriticalText.innerHTML = "Critical Violations: " + totalCritical;
     })
+}
+let searchText = "";
+let visibleMarkers = [];
+
+// shows only markers that match the grade filter AND the search text
+function applyFilters() {
+    visibleMarkers = allMarkers
+        .filter(m => visibleColors.has(m.color))
+        .filter(m => m.name.includes(searchText))
+        .map(m => m.marker);
+
+    markers.clearLayers();
+    markers.addLayers(visibleMarkers);
+    updateSearchStatus();
+}
+
+function updateLegendCounts() {
+    ["green", "yellow", "red", "grey"].forEach(color => {
+        const count = allMarkers.filter(m => m.color === color).length;
+        document.getElementById("count-" + color).textContent = count;
+    });
+}
+
+document.querySelectorAll(".legend-item").forEach(button => {
+    button.addEventListener("click", () => {
+        const color = button.dataset.color;
+
+        if (visibleColors.has(color)) {
+            visibleColors.delete(color);
+        } else {
+            visibleColors.add(color);
+        }
+
+        button.setAttribute("aria-pressed", visibleColors.has(color));
+        applyFilters();
+    });
+});
+
+// Search
+const searchInput = document.getElementById("search");
+const clearSearchBtn = document.getElementById("clearSearch");
+let searchTimer;
+
+// filters as you type
+searchInput.addEventListener("input", () => {
+    clearSearchBtn.hidden = searchInput.value === "";
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        searchText = searchInput.value.trim().toLowerCase();
+        applyFilters();
+    }, 150);
+});
+
+// Enter zooms to the results, Escape clears the search
+searchInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") zoomToResults();
+    if (event.key === "Escape") clearSearch();
+});
+
+clearSearchBtn.addEventListener("click", clearSearch);
+
+function clearSearch() {
+    clearTimeout(searchTimer);
+    searchInput.value = "";
+    searchText = "";
+    clearSearchBtn.hidden = true;
+    applyFilters();
+    searchInput.focus();
+}
+
+function zoomToResults() {
+    if (!searchText || visibleMarkers.length === 0) return;
+    const bounds = L.latLngBounds(visibleMarkers.map(m => m.getLatLng()));
+    map.flyToBounds(bounds, { padding: [60, 60], maxZoom: 17, duration: 0.8 });
+}
+
+function updateSearchStatus() {
+    const status = document.getElementById("searchStatus");
+    if (!searchText) {
+        status.hidden = true;
+        return;
+    }
+
+    const count = visibleMarkers.length;
+    const query = searchInput.value.trim();
+    status.hidden = false;
+
+    if (count === 0) {
+        status.textContent = visibleColors.size < 4
+            ? `No matches for "${query}" with the selected grades`
+            : `No restaurants match "${query}"`;
+    } else {
+        status.textContent = `${count} result${count === 1 ? "" : "s"} · press Enter to zoom`;
+    }
 }
