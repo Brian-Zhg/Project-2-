@@ -43,7 +43,7 @@ body {
   position: absolute;
   top: 16px;
   right: 16px;
-  bottom: 16px;
+  bottom: 20vh;
   width: min(380px, calc(100vw - 32px));
   z-index: 1001;
   visibility: hidden;
@@ -270,6 +270,7 @@ input:checked + .slider:before {
 /* ---------- Legend ---------- */
 #legend {
   position: absolute;
+  width: 15vh;
   left: 16px;
   bottom: 24px;
   z-index: 1000;

@@ -56,11 +56,12 @@ const icons = {
 };
 
 let latestRestaurants = new Map();
-let cuisines = new Set();
+let cuisines = new Map();
+let allViolations = [];
 
 //API call 
 async function getInspections() {
-    const url ="https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date&$where=grade%20IS%20NOT%20NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date&$order=camis%20ASC,grade_date%20ASC&$limit=1000"
+    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date,critical_flag,count(*)%20AS%20total&$where=grade%20IS%20NOT%20NULL%20AND%20violation_code%20IS%20NOT%20NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,cuisine_description,grade,grade_date,critical_flag&$order=camis%20ASC,grade_date%20DESC&$limit=1000"
     //const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?$select=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$where=grade IS NOT NULL&$group=camis,dba,boro,building,street,zipcode,latitude,longitude,grade,grade_date&$order=camis ASC,grade_date ASC&$limit=1000";
     let data = [];
     try {
@@ -78,11 +79,23 @@ async function getInspections() {
 
     data.forEach(restaurant => {
         latestRestaurants.set(restaurant.camis, restaurant);
-        if(restaurant.cuisine_description != undefined){
-            cuisines.add(restaurant.cuisine_description);
+        if (restaurant.cuisine_description != undefined) {
+        if(!cuisines.has(restaurant.cuisine_description)){
+            cuisines.set(restaurant.cuisine_description,{
+                nonCritical: 0,
+                critical: 0
+            });
+        }
+        else if(restaurant.critical_flag == "Critical"){
+            cuisines.get(restaurant.cuisine_description).critical++;
+        }
+        else{
+            cuisines.get(restaurant.cuisine_description).nonCritical++;
+        }
         }
     });
     console.log(cuisines);
+    console.log(Array.from(cuisines));
 
     let uniqueRestaurants = Array.from(latestRestaurants.values());
 
@@ -113,7 +126,9 @@ async function getInspections() {
     map.addLayer(markers);
 }
 
-getInspections();
+getInspections().then(() => {
+    createChart();
+});
 
 //creates markers and adds to cluster
 function createMarker(lat, lon, color, dba, camis) {
@@ -135,7 +150,7 @@ function createMarker(lat, lon, color, dba, camis) {
             document.getElementById("info").style.visibility = "visible";
             let toggle = document.getElementById("amount")
             let name = document.getElementById("rName");
-            let allViolations = [];
+            allViolations = [];
 
             toggle.checked = false;
             //api call for all from 1 resturaunt 
@@ -170,7 +185,9 @@ function createMarker(lat, lon, color, dba, camis) {
                 allViolations.push({
                     text: restaurant.violation_description,
                     date: restaurant.inspection_date,
-                    critical: restaurant.critical_flag
+                    critical: restaurant.critical_flag,
+                    cuisine: restaurant.cuisine_description
+
                 })
             })
             //displays recent first
@@ -209,7 +226,8 @@ function createMarker(lat, lon, color, dba, camis) {
         });
 }
 
-document.getElementById("closeInfo").addEventListener("click", function(){
+//close info tab 
+document.getElementById("closeInfo").addEventListener("click", function () {
     document.getElementById("info").style.visibility = "hidden";
 });
 
@@ -250,7 +268,7 @@ function display(allViolations, recent, mostRecent) {
         if (recent && new Date(restaurant.date).getTime() == mostRecent) {
             violations.append(paragraph);
             //only add if there is a violation 
-            if (restaurant.text != undefined) {total++;}
+            if (restaurant.text != undefined) { total++; }
             if (restaurant.critical == "Critical") {
                 totalCritical++;
             }
@@ -259,7 +277,7 @@ function display(allViolations, recent, mostRecent) {
         else if (!recent) {
             violations.append(paragraph);
             //only add if there is a violation 
-            if (restaurant.text != undefined ) {total++;}
+            if (restaurant.text != undefined) { total++; }
             if (restaurant.critical == "Critical") {
                 totalCritical++;
             }
@@ -273,23 +291,34 @@ function display(allViolations, recent, mostRecent) {
 }
 
 //Chart logic
-  const ctx = document.getElementById('myChart');
+function createChart() {
+    const ctx = document.getElementById('myChart');
 
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Array.from(cuisines.keys()),
+            datasets: [{
+                label: 'Non-Critical Violations',
+                data: Array.from(cuisines.values(), cuisine => cuisine.nonCritical),
+                borderWidth: 1,
+                stack: 'Stack 0',
+            },
+            {
+                label: 'Critical Violations',
+                data: Array.from(cuisines.values(), cuisine => cuisine.critical),
+                borderWidth: 1,
+                stack: 'Stack 0',
+            }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stacked: true
+                }
+            }
         }
-      }
-    }
-  });
+    });
+}
