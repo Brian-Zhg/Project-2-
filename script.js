@@ -79,19 +79,32 @@ async function getInspections() {
 
     data.forEach(restaurant => {
         latestRestaurants.set(restaurant.camis, restaurant);
-        if (restaurant.cuisine_description != undefined) {
-            if (!cuisines.has(restaurant.cuisine_description)) {
-                cuisines.set(restaurant.cuisine_description, {
-                    nonCritical: 0,
-                    critical: 0
-                });
-            }
-            else if (restaurant.critical_flag == "Critical") {
-                cuisines.get(restaurant.cuisine_description).critical++;
-            }
-            else {
-                cuisines.get(restaurant.cuisine_description).nonCritical++;
-            }
+
+        const cuisine = restaurant.cuisine_description;
+        if (!cuisine) return;
+
+        if (!cuisines.has(cuisine)) {
+            cuisines.set(cuisine, {
+                camis: new Set(),
+                nonCritical: 0,
+                critical: 0,
+                total: 0
+            });
+        }
+
+        const cuisineData = cuisines.get(cuisine);
+
+        // Count violations
+        if (restaurant.critical_flag === "Critical") {
+            cuisineData.critical++;
+        } else {
+            cuisineData.nonCritical++;
+        }
+
+        // Count unique restaurants
+        if (!cuisineData.camis.has(restaurant.camis)) {
+            cuisineData.camis.add(restaurant.camis);
+            cuisineData.total++;
         }
     });
     console.log(cuisines);
@@ -187,7 +200,6 @@ function createMarker(lat, lon, color, dba, camis) {
                     date: restaurant.inspection_date,
                     critical: restaurant.critical_flag,
                     cuisine: restaurant.cuisine_description
-
                 })
             })
             //displays recent first
