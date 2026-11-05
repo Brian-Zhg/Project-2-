@@ -3,6 +3,7 @@
 var map = L.map('map').setView([40.78, -73.97], 16);
 map.zoomControl.setPosition("bottomright");
 const markers = L.markerClusterGroup();
+let violationHeatmap = null;
 
 
 //uses openstreetmap's tiles
@@ -144,6 +145,9 @@ async function getInspections() {
 
     });
     map.addLayer(markers);
+
+    createViolationHeatmap();
+
     updateLegendCounts();
 }
 
@@ -168,6 +172,7 @@ function createMarker(lat, lon, color, dba, camis) {
             this.openPopup();
         })
         .on("click", async function () {
+            document.getElementById("chartLayout").style.display = "none";
             console.log(this.camis);
             document.getElementById("info").style.visibility = "visible";
             let toggle = document.getElementById("amount")
@@ -410,6 +415,31 @@ function showCheckboxes() {
         [...cuisines].sort((a, b) => a[0].localeCompare(b[0]))
     );
     document.getElementById("checkBoxes").innerHTML = "";
+        // Select All checkbox
+    const selectAll = document.createElement("input");
+    selectAll.type = "checkbox";
+
+    const selectAllLabel = document.createElement("label");
+    selectAllLabel.appendChild(selectAll);
+    selectAllLabel.appendChild(document.createTextNode("Select All"));
+
+    checkboxes.appendChild(selectAllLabel);
+
+    selectAll.addEventListener("change", () => {
+        checkboxes.querySelectorAll('input[type="checkbox"]:not(#selectAll)').forEach(box => {
+            box.checked = selectAll.checked;
+
+            if (box.checked) {
+                selectedCuisines.set(box.value, cuisines.get(box.value));
+            } else {
+                selectedCuisines.delete(box.value);
+            }
+        });
+
+        updateChart();
+    });
+
+    selectAll.id = "selectAll";
     sortedCuisines.forEach((value, key) => {
         const label = document.createElement("label");
 
@@ -419,15 +449,23 @@ function showCheckboxes() {
         checkbox.checked = selectedCuisines.has(key);
         checkbox.addEventListener("change", () => {
             console.log(checkbox.value, checkbox.checked);
+
             if (checkbox.checked) {
                 selectedCuisines.set(
                     checkbox.value,
                     cuisines.get(checkbox.value)
                 );
-            }
-            if (!checkbox.checked) {
+            } else {
                 selectedCuisines.delete(checkbox.value);
             }
+
+            // Update Select All checkbox
+            const individualCheckboxes = checkboxes.querySelectorAll(
+                'input[type="checkbox"]:not(#selectAll)'
+            );
+
+            selectAll.checked = [...individualCheckboxes].every(box => box.checked);
+
             updateChart();
         });
 
@@ -545,9 +583,103 @@ function updateSearchStatus() {
 document.getElementById("stats").addEventListener("click", function () {
     const chart = document.getElementById("chartLayout");
 
-    if (chart.style.display === "none") {
+    if (getComputedStyle(chart).display === "none") {
+        document.getElementById("info").style.visibility = "hidden";
         chart.style.display = "flex";
+
     } else {
         chart.style.display = "none";
     }
+});
+
+function closePanels() {
+    document.getElementById("info").style.visibility = "hidden";
+    document.getElementById("chartLayout").style.display = "none";
+}
+
+
+/* Heatmap */
+// a heatmap based on restaurant violation counts
+async function createViolationHeatmap() {
+
+    const params = new URLSearchParams({
+        $select: "camis,latitude,longitude,count(*) AS total_violations",
+        $where: "latitude IS NOT NULL AND longitude IS NOT NULL AND violation_code IS NOT NULL",
+        $group: "camis,latitude,longitude",
+        $limit: "1000"
+    });
+
+    const url = "https://data.cityofnewyork.us/resource/43nn-pn8j.json?" + params;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // find the highest violation count
+        const maxViolations = Math.max(
+            ...data.map(restaurant => Number(restaurant.total_violations))
+        );
+
+        // prepare coordinates and intensity values
+        const heatData = data.map(restaurant => {
+
+            const lat = Number(restaurant.latitude);
+            const lon = Number(restaurant.longitude);
+            const violations = Number(restaurant.total_violations);
+
+            // normalize the violation count between 0 and 1
+            const intensity = Math.log1p(violations) /
+                Math.log1p(maxViolations);
+
+            return [lat, lon, intensity];
+        });
+
+        // Add heatmap to Leaflet
+        violationHeatmap = L.heatLayer(heatData, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        max: 1,
+        gradient: {
+            0.2: "blue",
+            0.4: "lime",
+            0.6: "yellow",
+            1.0: "red"
+            }
+        });
+
+    // add heatmap to the map initially
+    violationHeatmap.addTo(map);
+
+        console.log("Violation heatmap created!");
+
+    } catch (error) {
+        console.error("Failed to create violation heatmap:", error);
+    }
+}
+
+const toggleHeatmapBtn = document.getElementById("toggleHeatmap");
+
+toggleHeatmapBtn.addEventListener("click", function () {
+
+    if (map.hasLayer(violationHeatmap)) {
+
+        // remove heatmap
+        map.removeLayer(violationHeatmap);
+
+        toggleHeatmapBtn.textContent = "Show heatmap";
+
+    } else {
+
+        // adding heatmap
+        map.addLayer(violationHeatmap);
+
+        toggleHeatmapBtn.textContent = "Hide heatmap";
+    }
+
 });

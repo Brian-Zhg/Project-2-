@@ -1,4 +1,9 @@
 /* ---------- Theme ---------- */
+
+* {
+    -webkit-user-select: none;
+    user-select: none;
+}
 :root {
   --bg: #ffffff;
   --surface: #f5f6f8;
@@ -12,9 +17,9 @@
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 
   /* grade colors (match the marker icons) */
-  --grade-a: #2aad27;
-  --grade-b: #cac428;
-  --grade-c: #cb2b3e;
+  --grade-a: #2a58ff;
+  --grade-b: #55bc0c;
+  --grade-c: #ee9528;
   --grade-p: #7b7b7b;
 
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -270,11 +275,27 @@ input:checked+.slider:before {
 
 #stats {
     position: absolute;
-    width: 15vh;
+    width: 100px;
     min-width: 180px;
-    left: 16px;
-    bottom: 230px;
+    left: 20px;
+    bottom: 290px;
     z-index: 1000;
+    font-size: 0.85rem;
+    font-family: "Inter", sans-serif;
+    background-color: #004AAD;
+    padding: 10px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    font-family: "Poppins", sans-serif;
+    font-style: normal;
+
+}
+
+#stats:hover {
+    background-color: #2563eb;
+    cursor: pointer;
 }
 
 /* ---------- Legend ---------- */
@@ -294,6 +315,9 @@ input:checked+.slider:before {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 #legend strong {
@@ -353,7 +377,6 @@ input:checked+.slider:before {
   width: 11px;
   height: 11px;
   margin-right: 8px;
-  border: 2px solid;
   border-radius: 50%;
   transition: background-color 0.15s;
 }
@@ -394,7 +417,7 @@ input:checked+.slider:before {
 /* ----------Chart css ---------- */
 
 #chartLayout {
-  background-color: white;
+  background-color:#004AAD;
     position: absolute;
     z-index: 1000;
 
@@ -405,12 +428,14 @@ input:checked+.slider:before {
     display: flex;
     align-items: flex-start;
     gap: 20px;
+    border-radius: 20px;
 }
 
 #chartContainer {
-    width: 50vw;
+    width: 40vw;
     height: 50vh;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
 }
 
 #myChart {
@@ -456,22 +481,27 @@ input:checked+.slider:before {
     width: 220px;
     flex-shrink: 0;
     font-family: inherit;
+    margin-left: 20px;
 }
 
 /* Dropdown container */
 .selectBox {
     position: relative;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: #1e40af;
+    border: 1px solid #1e40af;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     transition: border-color 0.2s, box-shadow 0.2s;
+    color: white;
     text-align: center;
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
 }
 
 .selectBox:hover {
     border-color: var(--accent);
-    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 3px 10px rgba(255, 255, 255, 0.1);
 }
 
 .selectBox select {
@@ -480,7 +510,7 @@ input:checked+.slider:before {
     font-family: inherit;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text);
+    color: white;
     background: transparent;
     border: none;
     outline: none;
@@ -490,13 +520,13 @@ input:checked+.slider:before {
 
 /* Dropdown arrow */
 .selectBox::after {
-    content: "⌄";
+    content: "▼";
     position: absolute;
-    right: 13px;
-    top: 50%;
+    right: 14px;
+    top: 60%;
+    color: white;
     transform: translateY(-60%);
     font-size: 18px;
-    color: var(--muted);
     pointer-events: none;
 }
 
@@ -585,7 +615,7 @@ input:checked+.slider:before {
 /* Search */
 #searchBox {
   position: absolute;
-  top: 16px;
+  top: 65px;
   left: 16px;
   z-index: 1000;
   width: min(340px, calc(100vw - 32px));
@@ -658,4 +688,71 @@ input:checked+.slider:before {
 #clearSearch[hidden],
 #searchStatus[hidden] {
   display: none;
+}
+
+/* ---------- Navbar ---------- */
+#navbar {
+    width: 100%;
+    height: 60px;
+    background-color: #E85207;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+
+#navbar h1 {
+  font-family: "Inter", sans-serif;
+  color: white;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 24px;
+  margin: 0;
+  padding: 0;
+}
+
+
+#logo {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-top: 3px;
+}
+
+#logo img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    margin-left: 10px;
+}
+
+#logo h1 {
+    font-size: 30px;
+    color: white;
+    margin: 0;
+}
+
+#toggleHeatmap {
+    position: absolute;
+    top: 390px;
+    left: 20px;
+    z-index: 1000;
+    padding: 10px 15px;
+    background: #E85207;
+    color: white;
+    border: 1px solid rgb(255, 255, 255);
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100px;
+    min-width: 180px;
+    font-family: "Poppins", sans-serif;
+    font-style: normal;
+    border-radius: 14px;
+    font-size: 0.85rem;
+}
+
+#toggleHeatmap:hover {
+    background-color: #ed6522;;
+    cursor: pointer;
 }

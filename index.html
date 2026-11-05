@@ -4,19 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NY Safe</title>
+    <title>NY SAFE</title>
     <link rel="stylesheet" href="style.css">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
-    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="icon" href="./assets/logo.png?v=2" type="image/png">
+        <!-- Make sure you put this AFTER Leaflet's CSS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 </head>
 
 <body>
     <div id="container">
+     <div id="navbar">
+       <div id="logo">
+        <img src="assets/logo.png" alt="NY Safe Logo">
+        <h1>NY SAFE</h1>
+         </div>
+     </div>
         <div id="map"></div>
         <div id="searchBox">
             <div class="search-field">
@@ -32,7 +44,8 @@
             <p id="searchStatus" hidden></p>
         </div>
         <div>
-        <button id="stats">See Stats</button>
+        <button id="stats">View statistics</button>
+        <button id="toggleHeatmap">Hide heatmap</button>
         <div id="legend"> 
             <strong>Grade</strong>
             <span class="legend-hint">Click to show / hide</span>
@@ -100,11 +113,9 @@
         <p><span class="dot c"></span>C</p>
         <p><span class="dot p"></span>Pending</p>
     </div>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <script src="script.js"></script>
 </body>
