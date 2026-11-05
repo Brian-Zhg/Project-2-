@@ -268,6 +268,15 @@ input:checked+.slider:before {
   border-radius: 50%;
 }
 
+#stats {
+    position: absolute;
+    width: 15vh;
+    min-width: 180px;
+    left: 16px;
+    bottom: 230px;
+    z-index: 1000;
+}
+
 /* ---------- Legend ---------- */
 #legend {
   position: absolute;
@@ -572,6 +581,7 @@ input:checked+.slider:before {
 
 #checkBoxes::-webkit-scrollbar-thumb:hover {
     background: var(--muted);
+}
 /* Search */
 #searchBox {
   position: absolute;

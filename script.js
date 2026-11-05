@@ -540,3 +540,14 @@ function updateSearchStatus() {
         status.textContent = `${count} result${count === 1 ? "" : "s"} · press Enter to zoom`;
     }
 }
+
+
+document.getElementById("stats").addEventListener("click", function () {
+    const chart = document.getElementById("chartLayout");
+
+    if (chart.style.display === "none") {
+        chart.style.display = "flex";
+    } else {
+        chart.style.display = "none";
+    }
+});
