@@ -382,15 +382,15 @@ input:checked+.slider:before {
 }
 
 .dot.a {
-  background: var(--grade-a);
+  background: green;
 }
 
 .dot.b {
-  background: var(--grade-b);
+  background: yellow;
 }
 
 .dot.c {
-  background: var(--grade-c);
+  background: red;
 }
 
 .dot.p {
