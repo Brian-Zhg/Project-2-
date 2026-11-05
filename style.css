@@ -43,7 +43,7 @@ body {
   position: absolute;
   top: 16px;
   right: 16px;
-  bottom: 16px;
+  bottom: 20vh;
   width: min(380px, calc(100vw - 32px));
   z-index: 1001;
   visibility: hidden;
@@ -59,15 +59,17 @@ body {
 
 #info h4 {
   margin: 0;
-  padding: 18px 52px 14px 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   font-size: 1.25rem;
   line-height: 1.3;
   border-bottom: 1px solid var(--border);
+  text-align: center;
 }
 
 #closeInfo {
   position: absolute;
-  top: 14px;
+  top: -3px;
   right: 14px;
   width: 32px;
   height: 32px;
@@ -75,14 +77,18 @@ body {
   border-radius: 50%;
   background: var(--surface);
   color: var(--muted);
-  font-size: 20px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #closeInfo:hover {
   background: var(--border);
-  color: var(--text);
+  color: red;
+
 }
 
 /* first / latest inspection */
@@ -99,7 +105,8 @@ body {
 }
 
 .timeHolder {
-  display: none; /* script.js switches this on after a click */
+  display: none;
+  /* script.js switches this on after a click */
   flex: 1;
   text-align: center;
 }
@@ -175,14 +182,14 @@ body {
 }
 
 /* totals row */
-#info > .statHolder {
+#info>.statHolder {
   gap: 0;
   padding: 10px 16px;
   border-top: 1px solid var(--border);
   font-size: 0.9rem;
 }
 
-#info > .statHolder p {
+#info>.statHolder p {
   margin: 0;
 }
 
@@ -240,16 +247,16 @@ body {
   transition: transform 0.25s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: var(--accent);
 }
 
-input:focus-visible + .slider {
+input:focus-visible+.slider {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
   transform: translateX(20px);
 }
 
@@ -264,6 +271,7 @@ input:checked + .slider:before {
 /* ---------- Legend ---------- */
 #legend {
   position: absolute;
+  width: 15vh;
   left: 16px;
   bottom: 24px;
   z-index: 1000;
@@ -275,6 +283,8 @@ input:checked + .slider:before {
   background: var(--bg);
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 }
 
 #legend strong {
@@ -339,10 +349,21 @@ input:checked + .slider:before {
   transition: background-color 0.15s;
 }
 
-.dot.a { background: var(--grade-a); border-color: var(--grade-a); }
-.dot.b { background: var(--grade-b); border-color: var(--grade-b); }
-.dot.c { background: var(--grade-c); border-color: var(--grade-c); }
-.dot.p { background: var(--grade-p); border-color: var(--grade-p); }
+.dot.a {
+  background: var(--grade-a);
+}
+
+.dot.b {
+  background: var(--grade-b);
+}
+
+.dot.c {
+  background: var(--grade-c);
+}
+
+.dot.p {
+  background: var(--grade-p);
+}
 
 /* ---------- Clusters ----------
  Default clusters are green/yellow/orange by size, which reads like
@@ -361,27 +382,196 @@ input:checked + .slider:before {
   font-weight: 600;
 }
 
+/* ----------Chart css ---------- */
+
+#chartLayout {
+  background-color: white;
+    position: absolute;
+    z-index: 1000;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+#chartContainer {
+    width: 50vw;
+    height: 50vh;
+    background-color: white;
+}
+
+#myChart {
+    width: 100%;
+    height: 100%;
+}
+
 /* ---------- Phones: panel becomes a bottom sheet ---------- */
 @media (max-width: 640px) {
   #info {
-      top: auto;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: auto;
-      height: 70vh;
-      border-radius: var(--radius) var(--radius) 0 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 70vh;
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 
   #legend {
-      left: 8px;
-      bottom: 16px;
+    left: 8px;
+    bottom: 16px;
   }
 }
+
 .leaflet-tile-pane {
   filter: saturate(0.6) brightness(1.06);
 }
 
+/* Checkboxes */
+.multipleSelection {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Dropdown container */
+/* ---------- Cuisine Checkboxes ---------- */
+
+.multipleSelection {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+    font-family: inherit;
+}
+
+/* Dropdown container */
+.selectBox {
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.selectBox:hover {
+    border-color: var(--accent);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
+}
+
+.selectBox select {
+    width: 100%;
+    padding: 11px 35px 11px 13px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Dropdown arrow */
+.selectBox::after {
+    content: "⌄";
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-60%);
+    font-size: 18px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.overSelect {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+}
+
+.selectBox select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Dropdown list */
+#checkBoxes {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1001;
+}
+
+/* Individual options */
+#checkBoxes label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    margin: 2px 0;
+
+    font-size: 0.85rem;
+    color: var(--text);
+    border-radius: 7px;
+    cursor: pointer;
+
+    transition: background-color 0.15s, color 0.15s;
+}
+
+#checkBoxes label:hover {
+    background: var(--surface);
+}
+
+/* Checkboxes */
+#checkBoxes input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Keyboard accessibility */
+#checkBoxes label:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* Scrollbar */
+#checkBoxes::-webkit-scrollbar {
+    width: 6px;
+}
+
+#checkBoxes::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+#checkBoxes::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
 /* Search */
 #searchBox {
   position: absolute;
