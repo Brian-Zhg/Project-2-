@@ -49,22 +49,19 @@
             </div>
         </div>
     </div>
-    <div id="chartContainer">
-        <!-- <canvas id="myChart"></canvas> -->
-        <form>
-            <div class="multipleSelection">
-                <div class="selectBox" onclick="showCheckboxes()">
-                    <select>
-                        <option>Select options</option>
-                    </select>
-                    <div class="overSelect"></div>
-                </div>
+    <div id="chartLayout">
+    <div class="multipleSelection">
+        <div class="selectBox" onclick="showCheckboxes()">
+            <div>Select Cuisines </div>
+        </div>
 
-                <div id="checkBoxes">
-                </div>
-            </div>
-        </form>
+        <div id="checkBoxes"></div>
     </div>
+
+    <div id="chartContainer">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
     <div id="legend">
         <p><span class="dot a"></span>A</p>
         <p><span class="dot b"></span>B</p>

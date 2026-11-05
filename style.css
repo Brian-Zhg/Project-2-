@@ -334,25 +334,29 @@ input:checked+.slider:before {
 
 /* ----------Chart css ---------- */
 
-#myChart {
-  position: absolute;
-  z-index: 100;
+#chartLayout {
+  background-color: white;
+    position: absolute;
+    z-index: 1000;
 
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 #chartContainer {
-  position: absolute;
-  z-index: 1000;
-  width: 50vw;
-  height: 50vh;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  overflow: visible;
+    width: 50vw;
+    height: 50vh;
+    background-color: white;
+}
+
+#myChart {
+    width: 100%;
+    height: 100%;
 }
 
 /* ---------- Phones: panel becomes a bottom sheet ---------- */
@@ -379,42 +383,143 @@ input:checked+.slider:before {
 
 /* Checkboxes */
 .multipleSelection {
-  width: 300px;
-  background-color: #BCC2C1;
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+    font-family: Arial, sans-serif;
 }
 
+/* Dropdown container */
+/* ---------- Cuisine Checkboxes ---------- */
+
+.multipleSelection {
+    position: relative;
+    width: 220px;
+    flex-shrink: 0;
+    font-family: inherit;
+}
+
+/* Dropdown container */
 .selectBox {
-  position: relative;
+    position: relative;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: center;
+}
+
+.selectBox:hover {
+    border-color: var(--accent);
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.1);
 }
 
 .selectBox select {
-  width: 100%;
-  font-weight: bold;
+    width: 100%;
+    padding: 11px 35px 11px 13px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    background: transparent;
+    border: none;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Dropdown arrow */
+.selectBox::after {
+    content: "⌄";
+    position: absolute;
+    right: 13px;
+    top: 50%;
+    transform: translateY(-60%);
+    font-size: 18px;
+    color: var(--muted);
+    pointer-events: none;
 }
 
 .overSelect {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
 }
 
+.selectBox select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Dropdown list */
 #checkBoxes {
-  display: none;
-  border: 1px #8DF5E4 solid;
-  overflow: scroll;
-  max-height:300px;
-  overflow-y: auto;
-  overflow-x: hidden;
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 6px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1001;
 }
 
+/* Individual options */
 #checkBoxes label {
-  display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    margin: 2px 0;
+
+    font-size: 0.85rem;
+    color: var(--text);
+    border-radius: 7px;
+    cursor: pointer;
+
+    transition: background-color 0.15s, color 0.15s;
 }
 
 #checkBoxes label:hover {
-  background-color: #4F615E;
-  color: white;
-  /* Added text color for better visibility */
+    background: var(--surface);
+}
+
+/* Checkboxes */
+#checkBoxes input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Keyboard accessibility */
+#checkBoxes label:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* Scrollbar */
+#checkBoxes::-webkit-scrollbar {
+    width: 6px;
+}
+
+#checkBoxes::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+
+#checkBoxes::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
 }

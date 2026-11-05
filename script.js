@@ -57,7 +57,9 @@ const icons = {
 
 let latestRestaurants = new Map();
 let cuisines = new Map();
+let selectedCuisines = new Map();
 let allViolations = [];
+let myChart = null;
 
 //API call 
 async function getInspections() {
@@ -306,19 +308,19 @@ function display(allViolations, recent, mostRecent) {
 function createChart() {
     const ctx = document.getElementById('myChart');
 
-    new Chart(ctx, {
+    myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Array.from(cuisines.keys()),
+            labels: Array.from(selectedCuisines.keys()),
             datasets: [{
                 label: 'Non-Critical Violations',
-                data: Array.from(cuisines.values(), cuisine => cuisine.nonCritical),
+                data: Array.from(selectedCuisines.values(), selectedCuisines => selectedCuisines.nonCritical),
                 borderWidth: 1,
                 stack: 'Stack 0',
             },
             {
                 label: 'Critical Violations',
-                data: Array.from(cuisines.values(), cuisine => cuisine.critical),
+                data: Array.from(selectedCuisines.values(), selectedCuisines => selectedCuisines.critical),
                 borderWidth: 1,
                 stack: 'Stack 0',
             }
@@ -335,6 +337,64 @@ function createChart() {
     });
 }
 
+function updateChart() {
+    const labels = Array.from(selectedCuisines.keys());
+
+    const nonCritical = Array.from(
+        selectedCuisines.values(),
+        cuisine => cuisine.nonCritical
+    );
+
+    const critical = Array.from(
+        selectedCuisines.values(),
+        cuisine => cuisine.critical
+    );
+
+    if (myChart) {
+        // Update existing chart
+        myChart.data.labels = labels;
+        myChart.data.datasets[0].data = nonCritical;
+        myChart.data.datasets[1].data = critical;
+
+        myChart.update();
+    } else {
+        // Create chart for the first time
+        const ctx = document.getElementById('myChart');
+
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Non-Critical Violations',
+                        data: nonCritical,
+                        borderWidth: 1,
+                        stack: 'Stack 0',
+                    },
+                    {
+                        label: 'Critical Violations',
+                        data: critical,
+                        borderWidth: 1,
+                        stack: 'Stack 0',
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        beginAtZero: true,
+                        stacked: true
+                    }
+                }
+            }
+        });
+    }
+}
+
 let show = true;
 
 function showCheckboxes() {
@@ -349,6 +409,20 @@ function showCheckboxes() {
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.value = key;
+        checkbox.checked = selectedCuisines.has(key);
+        checkbox.addEventListener("change", () => {
+            console.log(checkbox.value, checkbox.checked);
+            if (checkbox.checked) {
+                selectedCuisines.set(
+                    checkbox.value,
+                    cuisines.get(checkbox.value)
+                );
+            }
+            if (!checkbox.checked) {
+                selectedCuisines.delete(checkbox.value);
+            }
+            updateChart();
+        });
 
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(key));
@@ -364,3 +438,4 @@ function showCheckboxes() {
         show = true;
     }
 }
+
